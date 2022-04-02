@@ -164,7 +164,7 @@ df.head()
 df.info()
 # %%
 # save data to csv
-IWANTTOUPDATEMYDATA = True
+IWANTTOUPDATEMYDATA = False
 if IWANTTOUPDATEMYDATA:
     df.to_csv("../artifacts/cleandata.csv", index=False)
 
