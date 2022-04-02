@@ -166,6 +166,6 @@ df.info()
 # save data to csv
 IWANTTOUPDATEMYDATA = True
 if IWANTTOUPDATEMYDATA:
-    df.to_csv("../artifacts/clean_data.csv", index=False)
+    df.to_csv("../artifacts/cleandata.csv", index=False)
 
 # %%
