@@ -18,7 +18,9 @@ def rename_cols(df: pd.DataFrame) -> pd.DataFrame:
         "body type": "body_type",
         "weight": "weight_lbs",  # found it's all in lbs
     }
+
     df.rename(columns=rename_dict, inplace=True)
+
     return df
 
 
@@ -40,10 +42,12 @@ df.fit.value_counts()  # OK
 # fix bust size data
 df.bust_size.value_counts()
 
-# too many categories, but there are meaning in number and letter, so split into two categories
+
 def split_bust_size(df: pd.DataFrame) -> pd.DataFrame:
+    # too many categories, but there are meaning in number and letter, so split into two categories
     df["bust_size_num"] = df.bust_size.str.extract("(\d+)")
     df["bust_size_letter"] = df.bust_size.str.extract("(\D+)")
+
     # rename categories according to http://www.wirarpa.com/2019/04/28/measure-bra-size/
     df.bust_size_letter.replace(
         {
@@ -53,6 +57,7 @@ def split_bust_size(df: pd.DataFrame) -> pd.DataFrame:
         },
         inplace=True,
     )
+
     return df
 
 
@@ -121,7 +126,6 @@ df.review_date.value_counts()
 
 
 def split_dates(df: pd.DataFrame) -> pd.DataFrame:
-
     df = pd.merge(
         df,
         df.review_date.str.split(" ", expand=True).rename(
@@ -154,7 +158,6 @@ def split_dates(df: pd.DataFrame) -> pd.DataFrame:
 
 # %%
 def drop_extra_cols(df: pd.DataFrame) -> pd.DataFrame:
-
     drop_cols = [
         "bust_size",
         "review_text",
@@ -162,6 +165,7 @@ def drop_extra_cols(df: pd.DataFrame) -> pd.DataFrame:
         "height",
         "height_ft",
     ]
+
     df.drop(columns=drop_cols, inplace=True)
 
     return df
@@ -169,13 +173,13 @@ def drop_extra_cols(df: pd.DataFrame) -> pd.DataFrame:
 
 # %%
 def convert_data_types(df: pd.DataFrame) -> pd.DataFrame:
-
     cat_vars = [
         "fit",
         "bust_size_letter",
         "rented_for",
         "body_type",
     ]
+
     df[cat_vars] = df[cat_vars].astype("category")
 
     num_vars = [
@@ -185,6 +189,7 @@ def convert_data_types(df: pd.DataFrame) -> pd.DataFrame:
         "review_day_of_month",
         "review_year",
     ]
+
     for var in num_vars:
         df[var] = df[var].astype(str).str.extract("(\d+)")
         try:
@@ -216,6 +221,7 @@ clean_df.info()
 # %%
 # save data to csv
 IWANTTOUPDATEMYDATA = False
+
 if IWANTTOUPDATEMYDATA:
     clean_df.to_csv("../artifacts/cleandata.csv", index=False)
 
