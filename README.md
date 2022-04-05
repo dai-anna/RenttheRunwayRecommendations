@@ -9,3 +9,4 @@ Final project for IDS 705
 
 ## References
 Vincent's Talk: https://www.youtube.com/watch?v=68ABAU_V8qI
+Survey on Recommendation System: https://ieeexplore.ieee.org/abstract/document/7124857?casa_token=LelT0KsrMEIAAAAA:fIYbiIbml_C3SyQWGVXvxVn9aP2W6yd3LmNY5rmAqdkN-e_AvlR2_EBnWeS5qeHslSWOj67I
