@@ -7,20 +7,7 @@ import seaborn as sns
 from sklearn.experimental import enable_iterative_imputer  # experimental feature
 from sklearn.impute import IterativeImputer
 
-# from sklearn.model_selection import train_test_split
-# from sklearn.metrics import mean_squared_error
-# from sklearn.ensemble import RandomForestRegressor
-# from sklearn.model_selection import RandomizedSearchCV
-# from sklearn.model_selection import GridSearchCV
-# from sklearn.model_selection import KFold
-# from sklearn.model_selection import learning_curve
-# from sklearn.model_selection import ShuffleSplit
-# from sklearn.model_selection import validation_curve
-# from sklearn.model_selection import train_test_split
-# from sklearn.model_selection import cross_val_predict
-# from sklearn.model_selection import cross_val_score
-
-
+# import
 # %%
 # read in data
 df = pd.read_csv("../artifacts/cleandata.csv")
@@ -47,3 +34,5 @@ df["bust_size_num"].fillna(df.bust_size_num.mean(), inplace=True)
 # check those with missing bust_size_num
 df[df.bust_size_num.isnull()]
 # %%
+
+#

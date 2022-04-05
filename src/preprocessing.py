@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import train_test_split
+
 
 # %%
 # read in data
@@ -62,9 +64,8 @@ def split_bust_size(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # %%
+# check weights
 df.weight_lbs.value_counts()
-# fix weight to numeric
-# df.weight_lbs = df.weight_lbs.str.replace("lbs", "").astype(float)
 
 # %%
 # fix rented_for categories
@@ -157,6 +158,7 @@ def split_dates(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # %%
+# drop extra columns
 def drop_extra_cols(df: pd.DataFrame) -> pd.DataFrame:
     drop_cols = [
         "bust_size",
@@ -172,6 +174,7 @@ def drop_extra_cols(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # %%
+# fix data types
 def convert_data_types(df: pd.DataFrame) -> pd.DataFrame:
     cat_vars = [
         "fit",
@@ -203,6 +206,14 @@ def convert_data_types(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # %%
+# add response variable
+def add_response_var(df: pd.DataFrame) -> pd.DataFrame:
+    df["recommend"] = df.rating == 10
+
+    return df
+
+
+# %%
 clean_df = (
     df.copy()
     .pipe(split_bust_size)
@@ -211,6 +222,7 @@ clean_df = (
     .pipe(split_dates)
     .pipe(drop_extra_cols)
     .pipe(convert_data_types)
+    .pipe(add_response_var)
 )
 
 # %%
@@ -219,10 +231,33 @@ clean_df.head()
 clean_df.info()
 
 # %%
-# save data to csv
-IWANTTOUPDATEMYDATA = True
+# train-test-validation split
+X_train, X_val_test, y_train, y_val_test = train_test_split(
+    clean_df.copy().drop(columns=["recommend"]),
+    clean_df["recommend"],
+    test_size=0.4,
+    random_state=42,
+)
 
-if IWANTTOUPDATEMYDATA:
+X_val, X_test, y_val, y_test = train_test_split(
+    X_val_test,
+    y_val_test,
+    test_size=0.5,
+    random_state=42,
+)
+
+# %%
+# alternatively if we want to implement k-fold cross validation
+# https://stackoverflow.com/questions/39748660/how-to-perform-k-fold-cross-validation-with-tensorflow
+
+# %%
+# save data to disk
+IWANTTORESAVEMYDATA = True
+
+if IWANTTORESAVEMYDATA:
     clean_df.to_parquet("../artifacts/cleandata.parquet")
+    pd.concat([X_train, y_train], axis=1).to_parquet("../artifacts/train.parquet")
+    pd.concat([X_val, y_val], axis=1).to_parquet("../artifacts/val.parquet")
+    pd.concat([X_test, y_test], axis=1).to_parquet("../artifacts/test.parquet")
 
 # %%
