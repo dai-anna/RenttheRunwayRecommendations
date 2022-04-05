@@ -220,9 +220,9 @@ clean_df.info()
 
 # %%
 # save data to csv
-IWANTTOUPDATEMYDATA = False
+IWANTTOUPDATEMYDATA = True
 
 if IWANTTOUPDATEMYDATA:
-    clean_df.to_csv("../artifacts/cleandata.csv", index=False)
+    clean_df.to_parquet("../artifacts/cleandata.parquet")
 
 # %%
