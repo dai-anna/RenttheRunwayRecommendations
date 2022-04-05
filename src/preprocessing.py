@@ -252,7 +252,7 @@ X_val, X_test, y_val, y_test = train_test_split(
 
 # %%
 # save data to disk
-IWANTTORESAVEMYDATA = True
+IWANTTORESAVEMYDATA = False
 
 if IWANTTORESAVEMYDATA:
     clean_df.to_parquet("../artifacts/cleandata.parquet")
