@@ -6,3 +6,6 @@ Final project for IDS 705
 - Source: https://cseweb.ucsd.edu/~jmcauley/datasets.html#clothing_fit
 ### Amazon Kaggle Competition
 - https://discourse.aicrowd.com/t/datasets-released-submissions-open/7522
+
+## References
+Vincent's Talk: https://www.youtube.com/watch?v=68ABAU_V8qI
