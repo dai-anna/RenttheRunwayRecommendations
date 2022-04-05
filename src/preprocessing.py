@@ -11,13 +11,18 @@ df = pd.read_json("../data/renttherunway_final_data.json", lines=True)
 
 # %%
 # rename columns
-rename_dict = {
-    "bust size": "bust_size",
-    "rented for": "rented_for",
-    "body type": "body_type",
-    "weight": "weight_lbs",  # found it's all in lbs
-}
-df.rename(columns=rename_dict, inplace=True)
+def rename_cols(df: pd.DataFrame) -> pd.DataFrame:
+    rename_dict = {
+        "bust size": "bust_size",
+        "rented for": "rented_for",
+        "body type": "body_type",
+        "weight": "weight_lbs",  # found it's all in lbs
+    }
+    df.rename(columns=rename_dict, inplace=True)
+    return df
+
+
+rename_cols(df)
 
 # %%
 # quick look
@@ -36,29 +41,29 @@ df.fit.value_counts()  # OK
 df.bust_size.value_counts()
 
 # too many categories, but there are meaning in number and letter, so split into two categories
-df["bust_size_num"] = df.bust_size.str.extract("(\d+)").astype(float)
-df["bust_size_letter"] = df.bust_size.str.extract("(\D+)")
+def split_bust_size(df: pd.DataFrame) -> pd.DataFrame:
+    df["bust_size_num"] = df.bust_size.str.extract("(\d+)")
+    df["bust_size_letter"] = df.bust_size.str.extract("(\D+)")
+    # rename categories according to http://www.wirarpa.com/2019/04/28/measure-bra-size/
+    df.bust_size_letter.replace(
+        {
+            "dd": "e",
+            "d+": "d",
+            "ddd/e": "d",
+        },
+        inplace=True,
+    )
+    return df
 
-# rename categories according to http://www.wirarpa.com/2019/04/28/measure-bra-size/
-df.bust_size_letter.replace(
-    {
-        "dd": "e",
-        "d+": "d",
-        "ddd/e": "d",
-    },
-    inplace=True,
-)
 
 # %%
+df.weight_lbs.value_counts()
 # fix weight to numeric
-df.weight_lbs = df.weight_lbs.str.replace("lbs", "").astype(float)
+# df.weight_lbs = df.weight_lbs.str.replace("lbs", "").astype(float)
 
 # %%
 # fix rented_for categories
 df.rented_for.value_counts()
-
-# only one data point in "party: cocktail" so merge with "party"
-df.rented_for.replace("party: cocktail", "party", inplace=True)
 
 # %%
 # check review data
@@ -80,92 +85,138 @@ sns.countplot(df.category, ax=ax)
 # should potentially consolidate categories
 df.category.unique()
 
+
+def consolidate_categories(df: pd.DataFrame) -> pd.DataFrame:
+    # only one data point in "party: cocktail" so merge with "party"
+    df.rented_for.replace("party: cocktail", "party", inplace=True)
+    return df
+
+
 #%%
 # check height
 df.height.value_counts()
 
-# height is in ft and inches so split on space to inches and rename columns
-df = pd.merge(
-    df,
-    df.height.str.split(" ", expand=True).rename(
-        {0: "height_ft", 1: "height_in"}, axis=1
-    ),
-    left_index=True,
-    right_index=True,
-)
 
-# convert ft to inches then add converted inches to inches
-df.height_ft = df.height_ft.str.replace("'", "").astype(float) * 12
-df.height_in = df.height_in.str.replace('"', "").astype(float) + df.height_ft
+def combine_height(df: pd.DataFrame) -> pd.DataFrame:
+    # height is in ft and inches so split on space to inches and rename columns
+    df = pd.merge(
+        df,
+        df.height.str.split(" ", expand=True).rename(
+            {0: "height_ft", 1: "height_in"}, axis=1
+        ),
+        left_index=True,
+        right_index=True,
+    )
+
+    # convert ft to inches then add converted inches to inches
+    df.height_ft = df.height_ft.str.replace("'", "").astype(float) * 12
+    df.height_in = df.height_in.str.replace('"', "").astype(float) + df.height_ft
+
+    return df
+
 
 # %%
 # check date
 df.review_date.value_counts()
 
-df = pd.merge(
-    df,
-    df.review_date.str.split(" ", expand=True).rename(
-        {0: "review_month", 1: "review_day_of_month", 2: "review_year"}, axis=1
-    ),
-    left_index=True,
-    right_index=True,
+
+def split_dates(df: pd.DataFrame) -> pd.DataFrame:
+
+    df = pd.merge(
+        df,
+        df.review_date.str.split(" ", expand=True).rename(
+            {0: "review_month", 1: "review_day_of_month", 2: "review_year"}, axis=1
+        ),
+        left_index=True,
+        right_index=True,
+    )
+
+    # change months to numbers
+    month_dict = {
+        "January": 1,
+        "February": 2,
+        "March": 3,
+        "April": 4,
+        "May": 5,
+        "June": 6,
+        "July": 7,
+        "August": 8,
+        "September": 9,
+        "October": 10,
+        "November": 11,
+        "December": 12,
+    }
+
+    df.review_month.replace(month_dict, inplace=True)
+
+    return df
+
+
+# %%
+def drop_extra_cols(df: pd.DataFrame) -> pd.DataFrame:
+
+    drop_cols = [
+        "bust_size",
+        "review_text",
+        "review_summary",
+        "height",
+        "height_ft",
+    ]
+    df.drop(columns=drop_cols, inplace=True)
+
+    return df
+
+
+# %%
+def convert_data_types(df: pd.DataFrame) -> pd.DataFrame:
+
+    cat_vars = [
+        "fit",
+        "bust_size_letter",
+        "rented_for",
+        "body_type",
+    ]
+    df[cat_vars] = df[cat_vars].astype("category")
+
+    num_vars = [
+        "bust_size_num",
+        "weight_lbs",
+        "review_month",
+        "review_day_of_month",
+        "review_year",
+    ]
+    for var in num_vars:
+        df[var] = df[var].astype(str).str.extract("(\d+)")
+        try:
+            df[var] = df[var].astype(int)
+        except:
+            df[var] = df[var].astype(float)
+
+    df["review_date"] = pd.to_datetime(df["review_date"])
+
+    return df
+
+
+# %%
+clean_df = (
+    df.copy()
+    .pipe(split_bust_size)
+    .pipe(consolidate_categories)
+    .pipe(combine_height)
+    .pipe(split_dates)
+    .pipe(drop_extra_cols)
+    .pipe(convert_data_types)
 )
 
-# change months to numbers
-month_dict = {
-    "January": 1,
-    "February": 2,
-    "March": 3,
-    "April": 4,
-    "May": 5,
-    "June": 6,
-    "July": 7,
-    "August": 8,
-    "September": 9,
-    "October": 10,
-    "November": 11,
-    "December": 12,
-}
-df.review_month.replace(month_dict, inplace=True)
-
-# convert to separated vars to int type
-df.review_month = df.review_month.astype(int)
-df.review_day_of_month = df.review_day_of_month.str.extract("(\d+)").astype(int)
-df.review_year = df.review_year.astype(int)
-
-# convert initial date to datetime
-df["review_date"] = pd.to_datetime(df["review_date"])
-
 # %%
-# list of columns to drop
-drop_cols = [
-    "bust_size",
-    "review_text",
-    "review_summary",
-    "height",
-    "height_ft",
-]
-df.drop(columns=drop_cols, inplace=True)
-
+clean_df.head()
 # %%
-# lists of columns to convert data types
-cat_vars = [
-    "fit",
-    "bust_size_letter",
-    "rented_for",
-    "body_type",
-]
+clean_df.info()
 
-df[cat_vars] = df[cat_vars].astype("category")
-
-# %%
-df.head()
-# %%
-df.info()
 # %%
 # save data to csv
 IWANTTOUPDATEMYDATA = False
 if IWANTTOUPDATEMYDATA:
-    df.to_csv("../artifacts/cleandata.csv", index=False)
+    clean_df.to_csv("../artifacts/cleandata.csv", index=False)
 
 # %%
