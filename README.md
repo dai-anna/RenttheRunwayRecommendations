@@ -8,5 +8,7 @@ Final project for IDS 705
 - https://discourse.aicrowd.com/t/datasets-released-submissions-open/7522
 
 ## References
-Vincent's Talk: https://www.youtube.com/watch?v=68ABAU_V8qI
-Survey on Recommendation System: https://ieeexplore.ieee.org/abstract/document/7124857?casa_token=LelT0KsrMEIAAAAA:fIYbiIbml_C3SyQWGVXvxVn9aP2W6yd3LmNY5rmAqdkN-e_AvlR2_EBnWeS5qeHslSWOj67I
+- Vincent's Talk: https://www.youtube.com/watch?v=68ABAU_V8qI
+- Survey on Recommendation System: https://ieeexplore.ieee.org/abstract/document/7124857?casa_token=LelT0KsrMEIAAAAA:fIYbiIbml_C3SyQWGVXvxVn9aP2W6yd3LmNY5rmAqdkN-e_AvlR2_EBnWeS5qeHslSWOj67I
+- Neural Collaborative filtering (PyTorch): https://www.youtube.com/watch?v=O4lk9Lw7lS0
+- Tensorflow implementations: https://www.youtube.com/playlist?list=PLTjbQZu8nnshv8H5tV0fGh0ECBIXwuHJb
