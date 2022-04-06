@@ -67,7 +67,7 @@ def ranking(user_id):
 # Check Baseline random chance on validation set
 t_hat = 0
 for t in val:
-    t_hat += t[-1].astype(int)
+    t_hat += t[-1]
 
 t_hat / len(val)  # 56% accurate
 

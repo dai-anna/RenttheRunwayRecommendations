@@ -24,7 +24,6 @@ df = pd.read_parquet("../artifacts/train.parquet")
 # %%
 ###############################################################################
 ################################ SIMPLE EDA ###################################
-fig, ax = plt.subplots()
 
 
 # %%
@@ -33,6 +32,7 @@ df["user_id"].value_counts().sort_values(ascending=True)
 # >> Each user rated 1-239 items
 
 # plot distribution of ratings per user
+fig, ax = plt.subplots()
 sns.distplot(df["user_id"].value_counts().sort_values(ascending=True))
 
 # find 99.9% percentile of # ratings per user
@@ -56,13 +56,20 @@ df["item_id"].value_counts().sort_values(ascending=True).quantile(
 
 # %%
 # calculate average rating per item
-df.groupby("item_id").mean()["rating"].sort_values(ascending=True)
-# >> popularity differs a lot between items (between 2 to 10)
+df.groupby("item_id").mean()["recommend"].sort_values(ascending=True)
+# people like items from 0% of the time to 100% of the time -> very large difference
 
 # plot distribution of average rating per item
-sns.barplot(x="item_id", y=df["rating"], data=df, ci=None, palette=[BLUE, PINK])
+sns.barplot(x="item_id", y=df["recommend"], data=df, ci=None, palette=[BLUE, PINK])
+
+# %%
+# Check how how many times each item was rated
+df_pivot = pd.pivot_table(df, index="user_id", columns="item_id", values="recommend")
+df_pivot.notna().mean()
+# >> less than 0.01% of users have rated each item -> immense cold start issues
 
 
+# %%
 ###############################################################################
 ########################## IMPUTE MISSING VALUES ##############################
 # %%
