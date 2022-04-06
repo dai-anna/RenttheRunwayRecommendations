@@ -26,7 +26,9 @@ df = pd.read_parquet("../artifacts/train.parquet")
 ################################ SIMPLE EDA ###################################
 fig, ax = plt.subplots()
 
-# Check how many items each user rated
+
+# %%
+# check how many items each user rated
 df["user_id"].value_counts().sort_values(ascending=True)
 # >> Each user rated 1-239 items
 
@@ -40,6 +42,7 @@ df["user_id"].value_counts().sort_values(ascending=True).quantile(
 
 
 # %%
+# check how many times each item was rated
 df["item_id"].value_counts().sort_values(ascending=True)
 # >> Each item was rated by 1-1354 users
 
