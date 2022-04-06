@@ -209,6 +209,7 @@ def convert_data_types(df: pd.DataFrame) -> pd.DataFrame:
 # add response variable
 def add_response_var(df: pd.DataFrame) -> pd.DataFrame:
     df["recommend"] = df.rating == 10
+    df["recommend"] = df.recommend.astype(int)
 
     return df
 
@@ -252,7 +253,7 @@ X_val, X_test, y_val, y_test = train_test_split(
 
 # %%
 # save data to disk
-IWANTTORESAVEMYDATA = False
+IWANTTORESAVEMYDATA = True
 
 if IWANTTORESAVEMYDATA:
     clean_df.to_parquet("../artifacts/cleandata.parquet")

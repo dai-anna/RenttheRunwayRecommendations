@@ -15,18 +15,24 @@ from surprise import accuracy
 
 # %%
 # read in data
-# NOTE: we will only do EDA on training set
-df = pd.read_parquet("../artifacts/train.parquet")
+train = pd.read_parquet("../artifacts/train.parquet")
+val = pd.read_parquet("../artifacts/val.parquet")
+test = pd.read_parquet("../artifacts/test.parquet")
 
+df = pd.read_parquet("../artifacts/cleandata.parquet")  # full data set -> do not use
+
+dfs = [train, val, test]
 
 # %%
 # Load data into surprise
-df_cluster = df[["user_id", "item_id", "recommend"]].rename(
-    {"user_id": "userID", "item_id": "itemID"}, axis=1
-)
-reader = Reader(rating_scale=(0, 1))
-ds = Dataset.load_from_df(df_cluster, reader)
-train, test = train_test_split(ds, test_size=0.25, random_state=1)
+datasets = []
+for df in dfs:
+    df_cluster = df[["user_id", "item_id", "recommend"]].rename(
+        {"user_id": "userID", "item_id": "itemID"}, axis=1
+    )
+    reader = Reader(rating_scale=(0, 1))
+    ds = Dataset.load_from_df(df_cluster, reader)
+    datasets.append(ds)
 
 
 # %%
@@ -53,8 +59,24 @@ def ranking(user_id):
 
 
 # %%
-# Fit SVD (Matrix factorization)
-# This is a collaborative filtering approach
+# Random chance
+
+###############################################################################
+############################## RANDOM CHANCE ##################################
+
+# Check Baseline random chance on validation set
+t_hat = 0
+for t in val:
+    t_hat += t[-1].astype(int)
+
+t_hat / len(val)  # 56% accurate
+
+
+# %%
+# Collaborative filtering approach: Matrix Factorization
+
+###############################################################################
+######################## FIT SVD (MATRIX FACTORIZATION) #######################
 
 IWANTTORERUNMF = True
 
