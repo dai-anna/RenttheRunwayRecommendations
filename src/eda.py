@@ -33,7 +33,7 @@ df["user_id"].value_counts().sort_values(ascending=True)
 # >> Each user rated 1-239 items
 
 # plot distribution of ratings per user
-sns.displot(df["user_id"].value_counts().sort_values(ascending=True))
+sns.distplot(df["user_id"].value_counts().sort_values(ascending=True))
 
 # find 99.9% percentile of # ratings per user
 df["user_id"].value_counts().sort_values(ascending=True).quantile(
@@ -59,7 +59,7 @@ df["item_id"].value_counts().sort_values(ascending=True).quantile(
 df.groupby("item_id").mean()["rating"].sort_values(ascending=True)
 # >> popularity differs a lot between items (between 2 to 10)
 
-# plot distribution of average ratings per item
+# plot distribution of average rating per item
 sns.barplot(x="item_id", y=df["rating"], data=df, ci=None, palette=[BLUE, PINK])
 
 
@@ -73,8 +73,7 @@ df.isnull().sum()
 imp_mean = IterativeImputer(random_state=42)
 imp_mean.fit(df)
 # %%
-# add response variable
-df["recommend"] = df.rating == 10
+
 # %%
 df["recommend"].value_counts()
 # %%
