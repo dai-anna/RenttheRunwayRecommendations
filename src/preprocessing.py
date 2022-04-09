@@ -263,12 +263,14 @@ if IWANTTORESAVEMYDATA:
 
 # %%
 # try find users who only have one item in their history
-users_items = df.groupby("user_id").count()["item_id"].sort_values(ascending=True)
+users_items = clean_df.groupby("user_id").count()["item_id"].sort_values(ascending=True)
 # find user ids that only have more than one item in their history
 user_ids_morethan1 = users_items[users_items > 1].index
-reduced_df = df[df["user_id"].isin(user_ids_morethan1)]
+reduced_df = clean_df[clean_df["user_id"].isin(user_ids_morethan1)]
 
 if IWANTTORESAVEMYDATA:
     reduced_df.to_parquet("../artifacts/reduceddata.parquet")
 
+# %%
+reduced_df
 # %%
