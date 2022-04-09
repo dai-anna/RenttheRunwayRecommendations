@@ -1,4 +1,4 @@
-#helper functions
+# helper functions
 def accuracy(preds):
     correct = 0
     for pred in preds:
