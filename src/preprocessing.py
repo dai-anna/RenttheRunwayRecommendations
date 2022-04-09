@@ -1,5 +1,6 @@
 # %%
 # import libraries
+from distutils.command.clean import clean
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -261,4 +262,90 @@ if IWANTTORESAVEMYDATA:
     pd.concat([X_val, y_val], axis=1).to_parquet("../artifacts/val.parquet")
     pd.concat([X_test, y_test], axis=1).to_parquet("../artifacts/test.parquet")
 
+# %%
+clean_df['user_id'].value_counts()
+# %%
+sns.countplot(x='recommend', data=clean_df)
+# %%
+corr=clean_df.corr()
+sns.heatmap(corr)
+# %%
+#yearly trend of rating between 0 and 1
+sns.barplot(x=clean_df['review_year'], y=clean_df['rating'], hue=clean_df['recommend'])
+# %%
+#yearly trend of age between 0 and 1
+sns.barplot(x=clean_df['fit'], y=clean_df['age'], hue=clean_df['recommend'])
+# %%
+#using PCA to visualize clusters
+# Imports
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+
+# %%
+#remove columns recommend and rating 
+df_pca=clean_df.drop(['rating', 'recommend', 'review_date'], axis = 1)
+
+#%%
+#one-hot encoding
+categorical_columns = ['fit', 'rented_for', 'body_type', 'category', 'size', 'bust_size_letter', 'review_month', 'review_year']
+ 
+for column in categorical_columns:
+    dummies = pd.get_dummies(df_pca[column], prefix=column)
+    df_pca = pd.concat([df_pca, dummies], axis=1)
+    df_pca = df_pca.drop(columns=column)
+ 
+print(df_pca)
+
+#%%
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+
+imp_mean = IterativeImputer(random_state=1234)
+imp_mean.fit(df_pca)
+X= pd.DataFrame(imp_mean.transform(df_pca),columns=df_pca.columns)
+
+#%%
+X=X.drop(['user_id', 'item_id'], axis = 1)
+
+#%%
+# Standardize the data to have a mean of ~0 and a variance of 1
+X_std = StandardScaler().fit_transform(X)
+# Create a PCA instance: pca
+pca = PCA(n_components=50)
+principalComponents = pca.fit_transform(X_std)
+# Plot the explained variances
+features = range(pca.n_components_)
+plt.bar(features, pca.explained_variance_ratio_, color='black')
+plt.xlabel('PCA features')
+plt.ylabel('variance %')
+plt.xticks(features)
+# Save components to a DataFrame
+PCA_components = pd.DataFrame(principalComponents)
+
+# %%
+plt.scatter(PCA_components[0], PCA_components[1], alpha=.1, color='black')
+plt.xlabel('PCA 1')
+plt.ylabel('PCA 2')
+# %%
+ks = range(1, 10)
+inertias = []
+for k in ks:
+    # Create a KMeans instance with k clusters: model
+    model = KMeans(n_clusters=k)
+    
+    # Fit model to samples
+    model.fit(PCA_components.iloc[:,:3])
+    
+    # Append the inertia to the list of inertias
+    inertias.append(model.inertia_)
+    
+plt.plot(ks, inertias, '-o', color='black')
+plt.xlabel('number of clusters, k')
+plt.ylabel('inertia')
+plt.xticks(ks)
+plt.show()
 # %%
