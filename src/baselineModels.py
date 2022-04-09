@@ -11,7 +11,7 @@ from surprise import Reader
 from surprise.prediction_algorithms.matrix_factorization import SVD
 from surprise.model_selection.split import train_test_split
 from surprise import accuracy
-
+from helperfunctions import accuracy, ranking
 
 # %%
 # read in data
@@ -36,29 +36,6 @@ for df in dfs:
 
 
 # %%
-# A few helper functions
-def accuracy(preds):
-    correct = 0
-    for pred in preds:
-        p = 1 if pred.est > 0.5 else 0
-        if p == pred.r_ui:
-            correct += 1
-    return correct / len(preds)
-
-
-def ranking(user_id):
-    recs = []
-    rated = df.loc[df["user_id"] == user_id, "item_id"].unique()
-    print(rated)
-    for idx in range(5000):
-        if idx in rated:
-            continue
-        p = mf.predict(uid=user_id, iid=idx)
-        recs.append((idx, p.est))
-    return recs
-
-
-# %%
 # Random chance
 
 ###############################################################################
@@ -66,37 +43,10 @@ def ranking(user_id):
 
 # Check Baseline random chance on validation set
 t_hat = 0
-for t in val:
-    t_hat += t[-1]
+for t in val.iloc[:, -1]:
+    t_hat += t
 
-t_hat / len(val)  # 56% accurate
-
-
-# %%
-# Collaborative filtering approach: Matrix Factorization
-
-###############################################################################
-######################## FIT SVD (MATRIX FACTORIZATION) #######################
-
-IWANTTORERUNMF = True
-
-if IWANTTORERUNMF:
-    mf = SVD()
-    mf.fit(train)
-    # save to disk
-    with open("mf_model.pkl", "wb") as file:
-        pickle.dump(mf, file)
-else:
-    # load model from disk
-    with open("mf_model.pkl", "rb") as file:
-        mf = pickle.load(file)
-
-preds_mf = mf.test(test)
-
-
-#%%
-# Check accuracy of mf
-accuracy(preds_mf)
+t_hat / len(val)  # 65% accurate
 
 
 # %%

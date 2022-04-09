@@ -24,6 +24,10 @@ df = pd.read_parquet("../artifacts/cleandata.parquet")  # full data set -> do no
 dfs = [train, val, test]
 
 # %%
+# try to predict
+
+
+# %%
 # Load data into surprise
 datasets = []
 for df in dfs:
@@ -33,3 +37,30 @@ for df in dfs:
     reader = Reader(rating_scale=(0, 1))
     ds = Dataset.load_from_df(df_cluster, reader)
     datasets.append(ds)
+
+
+# %%
+# Collaborative filtering approach: Matrix Factorization
+
+###############################################################################
+######################## FIT SVD (MATRIX FACTORIZATION) #######################
+
+IWANTTORERUNMF = True
+
+if IWANTTORERUNMF:
+    mf = SVD()
+    mf.fit(train)
+    # save to disk
+    with open("mf_model.pkl", "wb") as file:
+        pickle.dump(mf, file)
+else:
+    # load model from disk
+    with open("mf_model.pkl", "rb") as file:
+        mf = pickle.load(file)
+
+preds_mf = mf.test(test)
+
+
+#%%
+# Check accuracy of mf
+accuracy(preds_mf)
