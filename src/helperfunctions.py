@@ -9,12 +9,13 @@ def accuracy(preds):
 
 
 def ranking(user_id):
-    recs = []
-    rated = df.loc[df["user_id"] == user_id, "item_id"].unique()
-    print(rated)
-    for idx in range(5000):
-        if idx in rated:
-            continue
-        p = mf.predict(uid=user_id, iid=idx)
-        recs.append((idx, p.est))
-    return recs
+    # recs = []
+    # rated = df.loc[df["user_id"] == user_id, "item_id"].unique()
+    # print(rated)
+    # for idx in range(5000):
+    #     if idx in rated:
+    #         continue
+    #     p = mf.predict(uid=user_id, iid=idx)
+    #     recs.append((idx, p.est))
+    # return recs
+    pass
