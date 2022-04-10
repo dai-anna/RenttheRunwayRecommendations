@@ -349,3 +349,10 @@ plt.ylabel('inertia')
 plt.xticks(ks)
 plt.show()
 # %%
+r = KMeans(n_clusters=3).fit(PCA_components.iloc[:,:3])
+l = r.labels_
+#%%
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+ax.scatter(PCA_components.iloc[:,0], PCA_components.iloc[:,1], PCA_components.iloc[:,2], c=l, alpha=0.2)
+plt.show()
