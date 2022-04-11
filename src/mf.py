@@ -5,15 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pickle
-from surprise.prediction_algorithms.knns import KNNBasic
 from surprise.dataset import Dataset
 from surprise import Reader
 from surprise.prediction_algorithms.matrix_factorization import SVD
-
-# from surprise import accuracy
 from surprise.model_selection.split import train_test_split
-
-from helperfunctions import accuracy, ranking
+from helperfunctions import accuracy
 
 
 # %%
@@ -47,17 +43,17 @@ for i, df in enumerate(dfs):
 ###############################################################################
 ######################## FIT SVD (MATRIX FACTORIZATION) #######################
 
-IWANTTORERUNMF = True
+IWANTTORERUNMF = False
 
 if IWANTTORERUNMF:
     mf = SVD()
     mf.fit(datasets["train"])
     # save to disk
-    with open("mf_model.pkl", "wb") as file:
+    with open("../artifacts/mf_model.pkl", "wb") as file:
         pickle.dump(mf, file)
 else:
     # load model from disk
-    with open("mf_model.pkl", "rb") as file:
+    with open("../artifacts/mf_model.pkl", "rb") as file:
         mf = pickle.load(file)
 
 

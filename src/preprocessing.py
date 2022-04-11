@@ -272,5 +272,4 @@ if IWANTTORESAVEMYDATA:
     reduced_df.to_parquet("../artifacts/reduceddata.parquet")
 
 # %%
-reduced_df
-# %%
+reduced_df  # %%
