@@ -1,6 +1,5 @@
 # Project specific
 .DS_Store
-*.ipynb
 *.json
 
 # Byte-compiled / optimized / DLL files
