@@ -272,4 +272,40 @@ if IWANTTORESAVEMYDATA:
     reduced_df.to_parquet("../artifacts/reduceddata.parquet")
 
 # %%
-reduced_df  # %%
+reduced_df
+
+# %%
+IWANTTOREPROCESSNN = False
+if IWANTTOREPROCESSNN:
+    # additional preprocessing for rnn application
+    def drop_cols(df: pd.DataFrame, cols: list) -> pd.DataFrame:
+        df = df.copy()
+        df.drop(cols, axis=1, inplace=True)
+        return df
+
+    def mean_impute(df: pd.DataFrame) -> pd.DataFrame:
+        """mean impute missing vals for numerical columns"""
+        df = df.copy()
+        df.fillna(df.mean(), inplace=True)
+        return df
+
+    def mode_impute(df: pd.DataFrame, cols: list) -> pd.DataFrame:
+        df = df.copy()
+        for col in cols:
+            df[col] = df[col].cat.add_categories("unknown").fillna("unknown")
+        return df
+
+    extra_cols = ["rating", "review_date"]
+    missing_cats = ["rented_for", "body_type", "bust_size_letter"]
+
+    df = (
+        df.copy()
+        .pipe(drop_cols, extra_cols)
+        .pipe(mean_impute)
+        .pipe(mode_impute, missing_cats)
+    )
+
+    df.isna().sum()
+
+    # save to parquet
+    df.to_parquet("../artifacts/nndata.parquet")

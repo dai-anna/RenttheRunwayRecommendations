@@ -1,0 +1,30 @@
+data_config:
+  embedding_cols:
+    - fit
+    - category
+    - rented_for
+    - body_type
+    - size
+    - bust_size_num
+    - bust_size_letter
+    - review_month
+    - review_year
+    - review_day_of_month
+  continuous_cols:
+    - weight_lbs
+    - age
+    - height_in
+  ohe_cols:
+    - 
+  mf_cols:
+    - user_id
+    - item_id
+  user_cols: 
+    - user_id
+    - weight_lbs
+    - body_type
+    - age
+    - bust_size_num
+    - bust_size_letter
+    - height_in
+    
