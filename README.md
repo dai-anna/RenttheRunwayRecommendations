@@ -12,3 +12,4 @@ Final project for IDS 705
 - Survey on Recommendation System: https://ieeexplore.ieee.org/abstract/document/7124857?casa_token=LelT0KsrMEIAAAAA:fIYbiIbml_C3SyQWGVXvxVn9aP2W6yd3LmNY5rmAqdkN-e_AvlR2_EBnWeS5qeHslSWOj67I
 - Neural Collaborative filtering (PyTorch): https://www.youtube.com/watch?v=O4lk9Lw7lS0
 - Tensorflow implementations: https://www.youtube.com/playlist?list=PLTjbQZu8nnshv8H5tV0fGh0ECBIXwuHJb
+- Categorical embeddings: https://arxiv.org/pdf/1604.06737v1.pdf; https://github.com/entron/entity-embedding-rossmann
