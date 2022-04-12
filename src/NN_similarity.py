@@ -13,7 +13,7 @@ random.seed(1234)
 #     "../artifacts/reduceddata.parquet", engine="pyarrow"
 # )  # this dataset should be a subset for each cluster
 
-df_m = pd.read_csv("../artifacts/Clauster_0.csv")
+df_m = pd.read_csv("../artifacts/Cluster_0.csv")
 
 # Processing the set for NN to train on
 df_mn = df_m.dropna()
