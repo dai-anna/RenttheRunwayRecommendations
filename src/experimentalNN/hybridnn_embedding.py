@@ -156,7 +156,7 @@ test_ds = df_to_dataset(
 
 # %%
 # split dataset into user specific and item specific
-user_specific_train = train_ds.filter(lambda x, y: x["user_id"] in user_specific)
+# user_specific_train = train_ds.filter(lambda x, y: x["user_id"] in user_specific)
 
 
 # %%
