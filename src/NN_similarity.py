@@ -134,11 +134,11 @@ gen = generate_batch(pairs, n_positive, negative_ratio=2)
 # Train
 h = model.fit_generator(
     gen,
-    epochs=100,
+    epochs=50,
     steps_per_epoch=len(pairs) // n_positive,
     verbose=2,
 )
-model.save("models/cluster0.h5")  # Save model here
+model.save("../models/cluster_0.h5")  # Save model here
 
 
 # Extract Embeddings
