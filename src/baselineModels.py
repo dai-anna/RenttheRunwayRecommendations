@@ -29,3 +29,4 @@ for t in val.iloc[:, -1]:
     t_hat += t
 
 t_hat / len(val)  # 65% accurate
+
