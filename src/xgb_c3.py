@@ -5,7 +5,12 @@ import numpy as np
 from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
 from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
+from bayes_opt import BayesianOptimization
+from bayes_opt.logger import JSONLogger
+from bayes_opt.event import Events
 from sklearn.metrics import accuracy_score, roc_auc_score
+from sklearn.model_selection import cross_val_score
+import pickle
 
 # %%
 # load data from parquet
@@ -24,6 +29,11 @@ df = df.drop(
 )
 features = pd.get_dummies(df.drop("recommend", axis=1)).astype(int)
 
+# %%
+# for k-fold cross validation
+X = features
+y = df.recommend
+
 # train test split
 X_train, X_test, y_train, y_test = train_test_split(
     features, df.recommend, test_size=0.3, random_state=1234
@@ -31,93 +41,112 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # %%
 # define hyperparameter search space
-space = {
-    "n_estimators": hp.uniform("n_estimators", 100, 500),
-    "learning_rate": hp.uniform("learning_rate", 0, 0.5),
-    "max_depth": hp.quniform("max_depth", 3, 18, 1),
-    "gamma": hp.uniform("gamma", 1, 9),
-    "reg_alpha": hp.quniform("reg_alpha", 40, 180, 1),
-    "colsample_bytree": hp.uniform("colsample_bytree", 0.5, 1),
-    "min_child_weight": hp.quniform("min_child_weight", 0, 10, 1),
+pbounds = {
+    "learning_rate": (0.01, 1.0),
+    "n_estimators": (100, 1000),
+    "max_depth": (3, 20),
+    "reg_alpha": (0, 1),
+    "reg_lambda": (0, 1),
+    "min_child_weight": (1, 6),
+    "subsample": (1.0, 1.0),  # Change for big datasets
+    "colsample": (1.0, 1.0),  # Change for datasets with lots of features
+    "gamma": (0, 9),
 }
 
 
-# %%
-# tune the model
-def objective(space):
+def xgboost_hyper_param(
+    learning_rate,
+    n_estimators,
+    max_depth,
+    reg_alpha,
+    reg_lambda,
+    min_child_weight,
+    subsample,
+    colsample,
+    gamma,
+):
+
+    max_depth = int(max_depth)
+    n_estimators = int(n_estimators)
+
     clf = XGBClassifier(
-        n_estimators=int(space["n_estimators"]),
-        max_depth=int(space["max_depth"]),
-        learning_rate=space["learning_rate"],
-        gamma=space["gamma"],
-        reg_alpha=space["reg_alpha"],
-        min_child_weight=space["min_child_weight"],
-        colsample_bytree=space["colsample_bytree"],
+        learning_rate=learning_rate,
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        reg_alpha=reg_alpha,
+        reg_lambda=reg_lambda,
+        min_child_weight=min_child_weight,
+        gamma=gamma,
         use_label_encoder=False,
         seed=1234,
         n_jobs=-1,
     )
+    return np.mean(cross_val_score(clf, X, y, cv=3, scoring="roc_auc"))
 
-    evaluation = [(X_train, y_train), (X_test, y_test)]
 
-    clf.fit(
-        X_train,
-        y_train,
-        eval_set=evaluation,
-        eval_metric="auc",
-        early_stopping_rounds=10,
-        verbose=False,
+optimizer = BayesianOptimization(
+    f=xgboost_hyper_param,
+    pbounds=pbounds,
+    random_state=1234,
+)
+
+#%%
+# tune hyperparameters
+IWANTTOWAITANOTHER20MINTOTUNETHESEPARAMS = True
+if IWANTTOWAITANOTHER20MINTOTUNETHESEPARAMS:
+    logger = JSONLogger(path="../artifacts/logs/c3.json")
+    optimizer.subscribe(Events.OPTIMIZATION_STEP, logger)
+
+    optimizer.maximize(
+        init_points=5,
+        n_iter=5,
     )
-
-    pred = clf.predict(X_test)
-    score = roc_auc_score(y_test, pred)
-    loss = 1 - score
-    return {"loss": loss, "status": STATUS_OK}
-
-
-best_hyperparams = fmin(fn=objective, space=space, algo=tpe.suggest, max_evals=100)
-
-
-print("The best hyperparameters are : ", "\n")
-print(best_hyperparams)
+    # save the best hyperparameters to disk
+    best_params = optimizer.max
+    with open("../artifacts/best_params_c3.pkl", "wb") as f:
+        pickle.dump(best_params, f)
+else:
+    with open("../artifacts/best_params_c3.pkl", "rb") as f:
+        best_params = pickle.load(f)
 
 # %%
+print(best_params)
 
-# retrain model
+# %%
+# train model using optimal hyperparameters
 clf_tuned = XGBClassifier(
-    n_estimators=int(best_hyperparams["n_estimators"]),
-    max_depth=int(best_hyperparams["max_depth"]),
-    gamma=best_hyperparams["gamma"],
-    reg_alpha=best_hyperparams["reg_alpha"],
-    min_child_weight=best_hyperparams["min_child_weight"],
-    colsample_bytree=best_hyperparams["colsample_bytree"],
+    learning_rate=best_params["params"]["learning_rate"],
+    n_estimators=int(best_params["params"]["n_estimators"]),
+    max_depth=int(best_params["params"]["max_depth"]),
+    reg_alpha=best_params["params"]["reg_alpha"],
+    reg_lambda=best_params["params"]["reg_lambda"],
+    min_child_weight=best_params["params"]["min_child_weight"],
+    gamma=best_params["params"]["gamma"],
     use_label_encoder=False,
     seed=1234,
     n_jobs=-1,
 )
 
-evaluation = [(X_train, y_train), (X_test, y_test)]
-
-clf_tuned.fit(
-    X_train,
-    y_train,
-    eval_set=evaluation,
-    eval_metric="auc",
-    early_stopping_rounds=25,
-    verbose=False,
-)
+clf_tuned.fit(X_train, y_train)
 
 # %%
-pred = clf_tuned.predict(X_test)
-roc_auc_score(y_test, pred)
+# evaluate model
+preds = clf_tuned.predict(X)
+roc_auc_score(y, preds)
+accuracy_score(y, preds)
+
 # %%
 # check baseline accuracy
 
 t_hat = 0
-for t in y_test:
+for t in y:
     t_hat += t
 
-t_hat / len(y_test)  # 62.34% accurate
+t_hat / len(y)  # 63.79% accurate
 
+# %%
+print("Baseline accuracy:", t_hat / len(y))
+print("Model accuracy:", accuracy_score(y, preds))
+print("Model AUC:", roc_auc_score(y, preds))
 
 # %%
