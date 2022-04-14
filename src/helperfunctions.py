@@ -1,21 +1,28 @@
-# helper functions
-def accuracy(preds):
-    correct = 0
-    for pred in preds:
-        p = 1 if pred.est > 0.5 else 0
-        if p == pred.r_ui:
-            correct += 1
-    return correct / len(preds)
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+# Add reusuable helpber functions here
 
 
-def ranking(user_id):
-    # recs = []
-    # rated = df.loc[df["user_id"] == user_id, "item_id"].unique()
-    # print(rated)
-    # for idx in range(5000):
-    #     if idx in rated:
-    #         continue
-    #     p = mf.predict(uid=user_id, iid=idx)
-    #     recs.append((idx, p.est))
-    # return recs
-    pass
+def prep_data_clf(data: pd.DataFrame, kfold: bool = True):
+    # drop rating for predictions because response variable is built from ratings
+    try:
+        data = data.copy().drop("rating", axis=1)
+    except:
+        pass
+
+    if kfold:
+        # for k-fold cross validation
+        X = data.drop("recommend", axis=1)
+        y = data.recommend
+        return X, y
+
+    else:
+        # train test split
+        X_train, X_test, y_train, y_test = train_test_split(
+            data.drop("recommend", axis=1),
+            data.recommend,
+            test_size=0.3,
+            random_state=1234,
+        )
+        return X_train, X_test, y_train, y_test

@@ -3,6 +3,7 @@
 *.json
 wandb
 *.pptx
+*/model_all_test.pkl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

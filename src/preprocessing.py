@@ -257,9 +257,6 @@ IWANTTORESAVEMYDATA = True
 
 if IWANTTORESAVEMYDATA:
     clean_df.to_parquet("../artifacts/cleandata.parquet")
-    pd.concat([X_train, y_train], axis=1).to_parquet("../artifacts/train.parquet")
-    pd.concat([X_val, y_val], axis=1).to_parquet("../artifacts/val.parquet")
-    pd.concat([X_test, y_test], axis=1).to_parquet("../artifacts/test.parquet")
 
 # %%
 # try find users who only have one item in their history
@@ -275,6 +272,7 @@ if IWANTTORESAVEMYDATA:
 reduced_df
 
 # %%
+"""Below is not used """
 IWANTTOREPROCESSNN = False
 if IWANTTOREPROCESSNN:
     # additional preprocessing for rnn application
@@ -289,7 +287,8 @@ if IWANTTOREPROCESSNN:
         df.fillna(df.mean(), inplace=True)
         return df
 
-    def mode_impute(df: pd.DataFrame, cols: list) -> pd.DataFrame:
+    def unknown_cat(df: pd.DataFrame, cols: list) -> pd.DataFrame:
+        """add "unknown" category column"""
         df = df.copy()
         for col in cols:
             df[col] = df[col].cat.add_categories("unknown").fillna("unknown")
@@ -302,7 +301,7 @@ if IWANTTOREPROCESSNN:
         df.copy()
         .pipe(drop_cols, extra_cols)
         .pipe(mean_impute)
-        .pipe(mode_impute, missing_cats)
+        .pipe(unknown_cat, missing_cats)
     )
 
     df.isna().sum()
