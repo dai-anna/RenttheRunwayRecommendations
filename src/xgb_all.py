@@ -21,12 +21,9 @@ from helperfunctions import prep_data_clf
 # %%
 # load/prep data from parquet
 df = pd.read_parquet("../artifacts/imputeddata.parquet")
-# X_train, X_test, y_train, y_test = prep_data_clf(df, kfold=False)
-X, y = prep_data_clf(df, kfold=True)
-X_train = X
-y_train = y
-X_test = X
-y_test = y
+
+
+X_train, X_test, y_train, y_test = prep_data_clf(df, kfold=False)
 
 # %%
 # define hyperparameter search space

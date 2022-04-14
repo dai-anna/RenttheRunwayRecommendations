@@ -12,16 +12,17 @@ mpl.rcParams["font.sans-serif"] = "Arial"
 mpl.rcParams["font.family"] = "sans-serif"
 
 DUKENAVY = "#012169"
+DUKEROYAL = "#00539B"
 PGREEN = "#ACCFBF"
+PPINK = "#EEBBCC"
 PORANGE = "#FCC9A5"
 PBLUE = "#C8E4FF"
-PPINK = "#EEBBCC"
 PYELLOW = "#F8F1AE"
 
 
 # %%
 # read in pickle file
-with open(f"../artifacts/cluster_models.pkl", "rb") as f:
+with open(f"../artifacts/cluster_models_final.pkl", "rb") as f:
     cluster_models = pickle.load(f)
 
 with open(f"../artifacts/model_all.pkl", "rb") as f:
@@ -33,7 +34,7 @@ models = [general_model] + cluster_models
 # %%
 # read in data ROC/PR curves
 fig, ax = plt.subplots(1, 2, figsize=(15, 7))
-colors = [DUKENAVY, PGREEN, PORANGE, PBLUE, PPINK, PYELLOW]
+colors = [DUKENAVY, PPINK, PGREEN, PORANGE, PBLUE, PYELLOW]
 
 for idx, model in enumerate(models):
 
@@ -55,6 +56,14 @@ for idx, model in enumerate(models):
         lw=2,
         color=colors[idx],
         label=f'{model["name"]} (AP = {round(model["auc_score"], 2)})',
+    )
+    ax[1].hlines(
+        model["baseline"],
+        xmin=0,
+        xmax=1,
+        lw=2,
+        linestyle="--",
+        color="lightgray",
     )
 
 # plot baselines

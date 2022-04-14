@@ -26,13 +26,29 @@ df = pd.read_parquet("../artifacts/imputeddata.parquet")
 
 # %%
 # merge and split data by cluster
-df = pd.merge(df, clusters[["cluser_label", "user_id"]], on="user_id")
+# df = pd.merge(df, clusters[["cluser_label", "user_id"]], on="user_id")
+
+# load data from csv
+c0 = pd.read_csv("../artifacts/Clauster_0.csv")
+c0users = c0.user_id.unique().astype(list)
+c1 = pd.read_csv("../artifacts/Clauster_1.csv")
+c1users = c1.user_id.unique().astype(list)
+c2 = pd.read_csv("../artifacts/Clauster_2.csv")
+c2users = c2.user_id.unique().astype(list)
 
 
 clustered_dfs = []
-for idx in range(0, 5):
-    split_df = df[df.cluser_label == idx].drop(["cluser_label"], axis=1)
+for idx in range(3):
+    split_df = df[df.user_id.isin(eval("c{}users".format(idx)))]
     clustered_dfs.append({"name": f"Cluster {idx}", "data": split_df})
+
+
+df = pd.read_parquet("../artifacts/imputeddata.parquet")
+
+# join in with the clusters
+clustered_dfs = []
+for idx in range(3):
+    clustered_dfs.append()
 
 
 # %%
