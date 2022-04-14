@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.experimental import enable_iterative_imputer  # experimental feature
 from sklearn.impute import IterativeImputer
 
-imp_mean = IterativeImputer(random_state=42)
+imp_mean = IterativeImputer(random_state=1234)
 
 # %%
 # read in data
@@ -14,8 +14,8 @@ df_cleaned = pd.read_parquet(
     engine="pyarrow",
 )
 # drop time features due to our assumptions
-
 print(df_cleaned.isna().sum())
+
 df_cleaned = df_cleaned.drop(
     ["review_month", "review_day_of_month", "review_year", "review_date"], axis=1
 )
