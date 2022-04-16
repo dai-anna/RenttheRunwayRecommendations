@@ -1,3 +1,4 @@
+# %%
 ################################
 # Model Training
 ################################
@@ -6,13 +7,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import (
-    RandomForestClassifier,
-    AdaBoostClassifier,
-    StackingClassifier,
-)
-from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
 from sklearn.metrics import (
@@ -21,19 +16,19 @@ from sklearn.metrics import (
     auc,
     average_precision_score,
 )
-from sklearn.model_selection import RandomizedSearchCV
-from scipy.stats import uniform
+
 from sklearn.model_selection import train_test_split
 
 
 import time
 
+# %%
 verbose = False
 n_jobs = 4
 
 
 df = pd.read_parquet(
-    "./artifacts/imputeddta.parquet",
+    "../artifacts/imputeddta.parquet",
     engine="pyarrow",
 )
 df.head()

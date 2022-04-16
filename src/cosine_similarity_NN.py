@@ -1,3 +1,4 @@
+# %%
 import keras
 from keras.layers import Input, Embedding, Dot, Reshape, Dense
 from keras.models import Model
@@ -9,9 +10,10 @@ import random
 random.seed(1234)
 
 
+# %%
 ##this is on the entire dataset. Replicate for each cluster
 df_m = pd.read_parquet(
-    "artifacts/imputeddata.parquet", engine="pyarrow"
+    "../artifacts/imputeddata.parquet", engine="pyarrow"
 )  # this dataset should be a subset for each cluster
 
 

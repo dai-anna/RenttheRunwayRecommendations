@@ -8,7 +8,7 @@ from sklearn.impute import IterativeImputer
 from sklearn.cluster import KMeans
 
 
-df = pd.read_parquet("artifacts/cleandata.parquet")
+df = pd.read_parquet("../artifacts/cleandata.parquet")
 df.head()
 
 # %%
@@ -43,7 +43,7 @@ imp_mean = IterativeImputer(random_state=42)
 imp_mean.fit(features)
 
 imputed = pd.DataFrame(imp_mean.transform(features), columns=features.columns)
-imputed.to_parquet("artifacts/imputeddata.parquet")  ##saving imputed, OHE data
+imputed.to_parquet("../artifacts/imputeddata.parquet")  ##saving imputed, OHE data
 
 
 ############################### ADDITIONAL EDA #################################

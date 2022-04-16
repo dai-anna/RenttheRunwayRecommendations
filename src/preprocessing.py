@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 
 # %%
 # read in data
-df = pd.read_json("../data/renttherunway_final_data.json", lines=True)
+df = pd.read_json("../data/renttherunway_final_data.json.gz", lines=True)
 
 # %%
 # rename columns
