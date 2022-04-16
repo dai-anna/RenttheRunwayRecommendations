@@ -33,7 +33,7 @@ n_jobs = 4
 
 
 df = pd.read_parquet(
-    "imputeddta.parquet",
+    "./artifacts/imputeddta.parquet",
     engine="pyarrow",
 )
 df.head()

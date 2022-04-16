@@ -2,7 +2,6 @@ import keras
 from keras.layers import Input, Embedding, Dot, Reshape, Dense
 from keras.models import Model
 import pandas as pd
-import parquet
 import matplotlib.pyplot as plt
 import numpy as np
 import random

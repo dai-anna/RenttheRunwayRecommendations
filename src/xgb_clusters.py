@@ -3,7 +3,6 @@
 import pandas as pd
 import numpy as np
 from xgboost import XGBClassifier
-from sklearn.model_selection import train_test_split
 from bayes_opt import BayesianOptimization
 from bayes_opt.logger import JSONLogger
 from bayes_opt.event import Events
@@ -21,20 +20,12 @@ from helperfunctions import prep_data_clf
 
 # %%
 # load data from parquet
-# clusters = pd.read_parquet("../artifacts/clustered_users.parquet")
-# df = pd.read_parquet("../artifacts/imputeddata.parquet")
-
-# %%
-# merge and split data by cluster
-# df = pd.merge(df, clusters[["cluser_label", "user_id"]], on="user_id")
-
-# load data
 
 df = pd.read_parquet("../artifacts/imputeddata.parquet")
 
-c0 = pd.read_csv("../artifacts/Clauster_0.csv")
-c1 = pd.read_csv("../artifacts/Clauster_1.csv")
-c2 = pd.read_csv("../artifacts/Clauster_2.csv")
+c0 = pd.read_csv("../artifacts/cluster_0.csv")
+c1 = pd.read_csv("../artifacts/cluster_1.csv")
+c2 = pd.read_csv("../artifacts/cluster_2.csv")
 
 c0_users = c0.user_id.unique().astype(list)
 c1_users = c1.user_id.unique().astype(list)
@@ -118,17 +109,17 @@ for idx, cluster in enumerate(clustered_dfs):
         best_params = optimizer.max
         best_params_clusters.append(best_params)
         print(f"Finished {idx+1} of 3")
-        with open(f"../artifacts/best_params_{idx+1}of3.pkl", "wb") as f:
+        with open(f"../models/params/best_params_{idx+1}of3.pkl", "wb") as f:
             pickle.dump(best_params, f)
     else:
-        with open(f"../artifacts/best_params_{idx+1}of3.pkl", "rb") as f:
+        with open(f"../models/params/best_params_{idx+1}of3.pkl", "rb") as f:
             best_params = pickle.load(f)
             best_params_clusters.append(best_params)
 
 
 # %%
 # run loop to train model with best hyperparameters
-IWANTTORETRAINMYMODELS = True
+IWANTTORETRAINMYMODELS = False
 if IWANTTORETRAINMYMODELS:
     models = []
 
@@ -180,10 +171,10 @@ if IWANTTORETRAINMYMODELS:
 
         print(f"Done with cluster {idx+1}")
 
-        with open(f"../artifacts/cluster_models_final.pkl", "wb") as f:
+        with open(f"../models/cluster_models_final.pkl", "wb") as f:
             pickle.dump(models, f)
     else:
-        with open(f"../artifacts/cluster_models_final.pkl", "rb") as f:
+        with open(f"../models/cluster_models_final.pkl", "rb") as f:
             models = pickle.load(f)
 
 # %%
@@ -201,10 +192,7 @@ for cluster in clustered_dfs:
     print(sum(cluster["recommend"]) / len(cluster["recommend"]))
 
 # %%
-c0 = pd.read_csv("../artifacts/Clauster_0.csv")
-c1 = pd.read_csv("../artifacts/Clauster_1.csv")
-c2 = pd.read_csv("../artifacts/Clauster_2.csv")
-
+# check random chance
 print(sum(c0["recommend"]) / len(c0["recommend"]))
 print(sum(c1["recommend"]) / len(c1["recommend"]))
 print(sum(c2["recommend"]) / len(c2["recommend"]))

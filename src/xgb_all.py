@@ -2,9 +2,7 @@
 # import libraries
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
-from sklearn.model_selection import train_test_split
 from bayes_opt import BayesianOptimization
 from bayes_opt.logger import JSONLogger
 from bayes_opt.event import Events
@@ -87,17 +85,17 @@ if IWANTTOWAITANOTHER20MINTOTUNETHESEPARAMS:
     )
     # save the best hyperparameters to disk
     best_params = optimizer.max
-    with open("../artifacts/best_params_all.pkl", "wb") as f:
+    with open("../models/params/best_params_all.pkl", "wb") as f:
         pickle.dump(best_params, f)
 else:
-    with open("../artifacts/best_params_all.pkl", "rb") as f:
+    with open("../models/params/best_params_all.pkl", "rb") as f:
         best_params = pickle.load(f)
 
 # %%
 print(best_params)
 
 # %%
-IWANTTORETRAINMYMODEL = True
+IWANTTORETRAINMYMODEL = False
 if IWANTTORETRAINMYMODEL:
 
     # train model using optimal hyperparameters
@@ -139,10 +137,10 @@ if IWANTTORETRAINMYMODEL:
         "y_test": y_test,
     }
 
-    with open("../artifacts/model_all_test.pkl", "wb") as f:
+    with open("../models/model_all.pkl", "wb") as f:
         pickle.dump(model, f)
 else:
-    with open("../artifacts/model_all.pkl", "rb") as f:
+    with open("../models/model_all.pkl", "rb") as f:
         model = pickle.load(f)
 
 
