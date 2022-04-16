@@ -3,7 +3,12 @@
 *.json
 wandb
 *.pptx
-*/model_all_test.pkl
+*model_all_test.pkl
+*model_all.pkl
+*cluster_models_test.pkl
+*cluster_models.pkl
+*cluster_models_final.pkl
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

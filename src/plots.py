@@ -35,6 +35,7 @@ models = [general_model] + cluster_models
 # read in data ROC/PR curves
 fig, ax = plt.subplots(1, 2, figsize=(15, 7))
 colors = [DUKENAVY, PPINK, PGREEN, PORANGE, PBLUE, PYELLOW]
+cluster_labels = ["(L)", "(M)", "(S)"]
 
 for idx, model in enumerate(models):
 
@@ -45,7 +46,7 @@ for idx, model in enumerate(models):
         model["y_test"],
         lw=2,
         color=colors[idx],
-        name=model["name"],
+        name=f'{model["name"]}',
         ax=ax[0],
     )
 
@@ -84,15 +85,15 @@ ax[0].plot(
 ax[0].set_title("ROC Curve", fontsize=16, fontweight="bold")
 ax[0].set_xlabel("False Positive Rate", fontsize=14)
 ax[0].set_ylabel("True Positive Rate", fontsize=14)
-ax[0].legend(loc="lower right")
+ax[0].legend(loc="lower right", fontsize=12)
 
 ax[1].set_title("Precision-Recall Curves", fontsize=16, fontweight="bold")
 ax[1].set_xlabel("Recall", fontsize=14)
 ax[1].set_ylabel("Precision", fontsize=14)
-
-ax[1].legend(loc="upper right")
+ax[1].legend(loc="upper right", fontsize=12)
 
 # set figure level title
 fig.suptitle("Evaluation on Test Dataset", fontsize=16, fontweight="bold")
+fig.tight_layout()
 sns.despine()
 # %%

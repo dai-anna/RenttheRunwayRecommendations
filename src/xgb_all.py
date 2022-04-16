@@ -2,6 +2,7 @@
 # import libraries
 import pandas as pd
 import numpy as np
+from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
 from bayes_opt import BayesianOptimization
@@ -146,4 +147,33 @@ else:
 
 
 # %%
-model
+import pandas as pd
+
+# create df for latex
+df_results = pd.DataFrame(
+    {
+        "AUC": {
+            "Random Chance": 0.5,
+            "Logistic Regression": 0.52,
+            "KNN": 0.49,
+            "Random Forest": 0.54,
+            "XGBoost": 0.56,
+        },
+        "AP": {
+            "Random Chance": 0.647,
+            "Logistic Regression": 0.643,
+            "KNN": 0.646,
+            "Random Forest": 0.645,
+            "XGBoost": 0.647,
+        },
+    }
+).T
+
+
+# %%
+df_results
+
+with open("../artifacts/general_model.tex", "w") as tf:
+    tf.write(df_results.to_latex(index=True))
+
+# %%

@@ -21,34 +21,29 @@ from helperfunctions import prep_data_clf
 
 # %%
 # load data from parquet
-clusters = pd.read_parquet("../artifacts/clustered_users.parquet")
-df = pd.read_parquet("../artifacts/imputeddata.parquet")
+# clusters = pd.read_parquet("../artifacts/clustered_users.parquet")
+# df = pd.read_parquet("../artifacts/imputeddata.parquet")
 
 # %%
 # merge and split data by cluster
 # df = pd.merge(df, clusters[["cluser_label", "user_id"]], on="user_id")
 
-# load data from csv
-c0 = pd.read_csv("../artifacts/Clauster_0.csv")
-c0users = c0.user_id.unique().astype(list)
-c1 = pd.read_csv("../artifacts/Clauster_1.csv")
-c1users = c1.user_id.unique().astype(list)
-c2 = pd.read_csv("../artifacts/Clauster_2.csv")
-c2users = c2.user_id.unique().astype(list)
-
-
-clustered_dfs = []
-for idx in range(3):
-    split_df = df[df.user_id.isin(eval("c{}users".format(idx)))]
-    clustered_dfs.append({"name": f"Cluster {idx}", "data": split_df})
-
+# load data
 
 df = pd.read_parquet("../artifacts/imputeddata.parquet")
 
-# join in with the clusters
+c0 = pd.read_csv("../artifacts/Clauster_0.csv")
+c1 = pd.read_csv("../artifacts/Clauster_1.csv")
+c2 = pd.read_csv("../artifacts/Clauster_2.csv")
+
+c0_users = c0.user_id.unique().astype(list)
+c1_users = c1.user_id.unique().astype(list)
+c2_users = c2.user_id.unique().astype(list)
+
 clustered_dfs = []
 for idx in range(3):
-    clustered_dfs.append()
+    split_df = df[df.user_id.isin(eval(f"c{idx}_users"))]
+    clustered_dfs.append({"name": f"Cluster {idx}", "data": split_df})
 
 
 # %%
@@ -112,31 +107,33 @@ for idx, cluster in enumerate(clustered_dfs):
     # tune hyperparameters
     IWANTTOWAITHOURSTOTUNETHESEPARAMS = False
     if IWANTTOWAITHOURSTOTUNETHESEPARAMS:
-        logger = JSONLogger(path=f"../artifacts/logs/c_{idx}.json")
+        logger = JSONLogger(path=f"../artifacts/logs/c_{idx+1}of3.json")
         optimizer.subscribe(Events.OPTIMIZATION_STEP, logger)
-
+        print(f"Tuning hyperparameters for cluster {idx+1} of 3")
         optimizer.maximize(
-            init_points=5,
+            init_points=3,
             n_iter=5,
         )
         # save the best hyperparameters to disk
         best_params = optimizer.max
-        with open(f"../artifacts/best_params_{idx}.pkl", "wb") as f:
+        best_params_clusters.append(best_params)
+        print(f"Finished {idx+1} of 3")
+        with open(f"../artifacts/best_params_{idx+1}of3.pkl", "wb") as f:
             pickle.dump(best_params, f)
     else:
-        with open(f"../artifacts/best_params_{idx}.pkl", "rb") as f:
+        with open(f"../artifacts/best_params_{idx+1}of3.pkl", "rb") as f:
             best_params = pickle.load(f)
             best_params_clusters.append(best_params)
 
 
 # %%
 # run loop to train model with best hyperparameters
-IWANTTORETRAINMYMODELS = False
+IWANTTORETRAINMYMODELS = True
 if IWANTTORETRAINMYMODELS:
     models = []
 
     for idx, best_params in enumerate(best_params_clusters):
-        print(f"Starting cluster {idx}")
+        print(f"Starting cluster {idx+1}")
 
         clf_tuned = XGBClassifier(
             learning_rate=best_params["params"]["learning_rate"],
@@ -181,13 +178,34 @@ if IWANTTORETRAINMYMODELS:
             }
         )
 
-        print(f"Done with cluster {idx}")
+        print(f"Done with cluster {idx+1}")
 
-        with open(f"../artifacts/cluster_models_test.pkl", "wb") as f:
+        with open(f"../artifacts/cluster_models_final.pkl", "wb") as f:
             pickle.dump(models, f)
     else:
-        with open(f"../artifacts/cluster_models_test.pkl", "rb") as f:
+        with open(f"../artifacts/cluster_models_final.pkl", "rb") as f:
             models = pickle.load(f)
 
 # %%
 models
+
+#%%
+# check lift
+for model in models:
+    print(f"{model['name']}")
+    print(f"model['ap_score']")
+    print(f"Lift: {model['ap_score']/model['baseline']}")
+
+# %%
+for cluster in clustered_dfs:
+    print(sum(cluster["recommend"]) / len(cluster["recommend"]))
+
+# %%
+c0 = pd.read_csv("../artifacts/Clauster_0.csv")
+c1 = pd.read_csv("../artifacts/Clauster_1.csv")
+c2 = pd.read_csv("../artifacts/Clauster_2.csv")
+
+print(sum(c0["recommend"]) / len(c0["recommend"]))
+print(sum(c1["recommend"]) / len(c1["recommend"]))
+print(sum(c2["recommend"]) / len(c2["recommend"]))
+# %%
