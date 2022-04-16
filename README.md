@@ -31,8 +31,11 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 **Step 5: Run Our Scripts**
+
 *Note*: To run the experiment for the first time, make sure to turn all the "switches" on in all the scripts (i.e. `IWANTTOSAVEMYDATA = True`)
+
 *Note*: We use relative file paths in the scripts
+
 ```
 cd src
 ```
