@@ -1,7 +1,7 @@
 # Project specific
 .DS_Store
 *.json
-*.json.gz
+*.gz
 wandb
 *.pptx
 *model_all_test.pkl
